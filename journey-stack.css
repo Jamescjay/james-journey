@@ -1,0 +1,287 @@
+/* ==========================================================================
+   Journey Stack - isolated scroll-driven stacked-screen showcase.
+   Every rule is namespaced under .jstack / .jcard so it cannot leak into
+   the rest of the site. Palette values mirror the existing design tokens.
+   ========================================================================== */
+
+.jstack {
+  --jstack-vh: 1vh;
+  --jstack-step: 78;                            /* vh of scroll consumed per screen */
+  --jstack-nav: 68px;                           /* height of the sticky site nav */
+  --jstack-media-h: clamp(190px, 46vh, 620px);  /* pre-JS fallback; JS fits it to the stage */
+  --jstack-card-w: 1160px;
+  --jstack-line: #cfc3b2;
+  --jstack-ink: #171512;
+  --jstack-muted: #73695d;
+  --jstack-accent: #ef5b43;
+  --jstack-surface: #fffdf9;
+  --jstack-veil: #f4efe5;
+
+  position: relative;
+  border-top: 1px solid var(--jstack-line);
+  overflow-x: clip;
+}
+
+@supports (height: 1svh) {
+  .jstack { --jstack-vh: 1svh; }
+}
+
+/* The runway: one viewport to settle in, plus one step per transition. */
+.jstack__track {
+  height: calc((100 + (var(--jstack-steps, 0) * var(--jstack-step))) * var(--jstack-vh));
+}
+
+.jstack__sticky {
+  position: sticky;
+  top: 0;
+  height: calc(100 * var(--jstack-vh));
+  overflow: hidden;                             /* clips depth, kills any overflow */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 1.8vh, 20px);
+  /* Keep the whole composition clear of the sticky site nav. */
+  padding: calc(var(--jstack-nav) + clamp(14px, 3vh, 30px)) 0 clamp(14px, 3vh, 30px);
+}
+
+.jstack__inner {
+  width: min(1160px, calc(100% - 44px));
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------- intro */
+
+.jstack__intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.jstack h2 {
+  font-size: clamp(22px, 2.3vw, 31px);
+  line-height: 1.1;
+  margin: 6px 0 0;
+  max-width: 30ch;
+}
+
+/* --------------------------------------------------------------- stage */
+
+.jstack__stage-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+.jstack__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  perspective: 2000px;
+  perspective-origin: 50% 45%;
+}
+
+/* ---------------------------------------------------------------- card */
+
+.jcard {
+  position: absolute;
+  top: calc(50% + var(--jstack-peek, 0px));
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: min(var(--jstack-card-w), calc(var(--jstack-media-h) * 1.58));
+  margin-inline: auto;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform:
+    translate3d(0, calc(-50% + var(--jy, 0px)), 0)
+    rotateX(var(--jrot, 0deg))
+    scale(var(--jsc, 1));
+  transform-origin: 50% 28%;
+  opacity: var(--jop, 1);
+  z-index: var(--jz, 1);
+  pointer-events: none;
+}
+
+.jcard.is-active { pointer-events: auto; }
+
+.jcard.is-offstage {
+  visibility: hidden;
+  content-visibility: hidden;
+}
+
+.jcard.is-near { will-change: transform, opacity; }
+
+.jcard__screen {
+  position: relative;
+  border: 1px solid var(--jstack-line);
+  border-radius: 22px;
+  background: var(--jstack-surface);
+  box-shadow: 0 26px 54px -22px rgba(47, 38, 21, .34), 0 2px 6px rgba(47, 38, 21, .06);
+  overflow: hidden;
+}
+
+.jcard__chrome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--jstack-line);
+  background: #f7f2e9;
+  font: 700 11px/1 Georgia, serif;
+  letter-spacing: .14em;
+  color: var(--jstack-muted);
+}
+
+.jcard__lights {
+  display: flex;
+  gap: 5px;
+  flex: none;
+}
+
+.jcard__lights i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--jstack-line);
+}
+
+.jcard.is-active .jcard__lights i:first-child { background: var(--jstack-accent); }
+
+.jcard__tag {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jcard__media {
+  position: relative;
+  /* Matches the dominant ratio of the exports (1592x1020) so the app
+     screens fill the frame almost exactly; wider or squarer boards are
+     matted rather than cropped. */
+  aspect-ratio: 1592 / 1020;
+  max-height: var(--jstack-media-h);
+  padding: 12px;
+  background: #efe8dc;
+}
+
+.jcard__media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* Depth veil - compositor friendly dimming for cards further back. */
+.jcard__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--jstack-veil);
+  opacity: var(--jveil, 0);
+}
+
+.jcard__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 14px 4px 0;
+  /* Only the focused screen shows its caption - queued screens would
+     otherwise stack their captions below the front frame. */
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+
+.jcard.is-active .jcard__meta { opacity: 1; }
+
+.jcard__index {
+  font: 700 12px/1 Georgia, serif;
+  letter-spacing: .16em;
+  color: var(--jstack-accent);
+  flex: none;
+}
+
+.jcard__meta h3 {
+  font-size: clamp(17px, 2vw, 22px);
+  line-height: 1.2;
+  margin: 0;
+  flex: none;
+}
+
+.jcard__meta p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--jstack-muted);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 900px) {
+  .jstack {
+    --jstack-step: 70;
+    --jstack-media-h: clamp(160px, 38vh, 420px);
+  }
+  .jstack__intro { align-items: flex-start; }
+  .jcard__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-top: 12px;
+  }
+  .jcard__meta p { -webkit-line-clamp: 2; }
+}
+
+@media (max-width: 560px) {
+  .jstack { --jstack-media-h: clamp(140px, 30vh, 300px); }
+  .jcard__screen { border-radius: 16px; }
+  .jcard__chrome { padding: 7px 11px; font-size: 10px; }
+}
+
+/* ------------------------------------- static fallback / reduced motion */
+
+.jstack--static { overflow-x: visible; }
+
+.jstack--static .jstack__track { height: auto; }
+
+.jstack--static .jstack__sticky {
+  position: static;
+  height: auto;
+  overflow: visible;
+  padding: 60px 0 20px;
+}
+
+.jstack--static .jstack__stage-wrap { display: block; }
+
+.jstack--static .jstack__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 46px;
+  perspective: none;
+  padding: 34px 0 60px;
+}
+
+.jstack--static .jcard {
+  position: relative;
+  top: auto;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  content-visibility: visible;
+  will-change: auto;
+}
+
+.jstack--static .jcard__veil { display: none; }
+
+.jstack--static .jcard__meta { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jcard__meta { transition: none; }
+}

@@ -1,0 +1,307 @@
+/* ==========================================================================
+   Journey UI - two small, self-contained additions:
+     1. .pill  - whole-page scroll tracker (section name + overall %)
+     2. .lb    - click-to-expand image lightbox
+   Namespaced so they cannot leak into the rest of the site. Colours and
+   type are reused from the existing design tokens.
+   ========================================================================== */
+
+:root {
+  --ui-line: #cfc3b2;
+  --ui-ink: #171512;
+  --ui-muted: #73695d;
+  --ui-accent: #ef5b43;
+  --ui-surface: #fffdf9;
+}
+
+/* ------------------------------------------------- 1. scroll tracker pill */
+
+.pill {
+  position: fixed;
+  top: 84px;                       /* clears the 68px sticky nav */
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px 7px 18px;
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  background: #fffdf9f2;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px -12px rgba(47, 38, 21, .38);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease, transform .35s ease;
+  max-width: calc(100% - 32px);
+}
+
+.pill.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.pill__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--ui-ink);
+  font: 700 13px/1 Georgia, serif;
+  letter-spacing: .04em;
+  min-width: 0;
+}
+
+.pill__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 42vw;
+}
+
+.pill__chev {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  transition: transform .25s ease;
+}
+
+.pill__btn[aria-expanded="true"] .pill__chev { transform: rotate(180deg); }
+
+.pill__pct {
+  flex: none;
+  min-width: 46px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--ui-ink);
+  color: #fff;
+  text-align: center;
+  font: 700 12px/1 Georgia, serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.pill__btn:focus-visible,
+.pill__jump:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+
+/* jump menu behind the chevron */
+.pill__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  width: max-content;
+  max-width: min(320px, 86vw);
+  max-height: min(58vh, 420px);
+  overflow-y: auto;
+  border: 1px solid var(--ui-line);
+  border-radius: 16px;
+  background: var(--ui-surface);
+  box-shadow: 0 18px 44px -16px rgba(47, 38, 21, .45);
+}
+
+.pill__menu[hidden] { display: none; }
+
+.pill__jump {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: var(--ui-ink);
+  font: 400 13px/1.3 Segoe UI, Arial, sans-serif;
+}
+
+.pill__jump:hover { background: #f2ece1; }
+
+.pill__jump[aria-current="true"] {
+  font-weight: 700;
+  color: var(--ui-accent);
+}
+
+@media (max-width: 700px) {
+  .pill { top: 76px; padding-left: 14px; }
+  .pill__name { max-width: 38vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill { transition: none; }
+}
+
+/* -------------------------------------------------------- 2. lightbox */
+
+.lb-able {
+  cursor: zoom-in;
+  position: relative;
+}
+
+/* Specificity note: the site has a `.scene span` rule (0,1,1) that would
+   otherwise win over a single class and drag this to the bottom-left, so
+   these are scoped through .lb-wrap and reset the edges explicitly. */
+.lb-wrap .lb-hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  z-index: 4;
+  transform: translate(-50%, -50%) scale(.94);
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: #171512e8;
+  color: #fff;
+  font: 700 12px/1 Georgia, serif;
+  letter-spacing: .08em;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s ease, transform .25s ease;
+  white-space: nowrap;
+}
+
+.lb-wrap:hover .lb-hint,
+.lb-wrap:focus-within .lb-hint {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.lb-wrap { position: relative; }
+
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 3vw, 44px);
+  background: #2b2926f2;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .28s ease, visibility .28s;
+}
+
+.lb.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lb__figure {
+  margin: 0;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transform: scale(.97);
+  transition: transform .28s ease;
+}
+
+.lb.is-open .lb__figure { transform: scale(1); }
+
+.lb__img,
+.lb__vid {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 130px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fffdf9;
+  box-shadow: 0 30px 80px -20px #000000a6;
+  filter: none !important;              /* never inherit the grayscale rule */
+}
+
+.lb__vid {
+  background: #171512;
+  width: min(1400px, 100%);
+}
+
+.lb__img[hidden], .lb__vid[hidden] { display: none; }
+
+.lb__cap {
+  margin: 0;
+  color: #efe8dc;
+  font: 400 13px/1.5 Segoe UI, Arial, sans-serif;
+  text-align: center;
+  max-width: 70ch;
+}
+
+.lb__close {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffff1a;
+  color: #fff;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+
+.lb__close:hover { background: #ffffff33; }
+
+.lb__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.lb__close svg { width: 17px; height: 17px; }
+
+html.lb-open { overflow: hidden; }
+
+/* expand control on the prototype video */
+.proto { position: relative; }
+
+.proto__expand {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: #171512d9;
+  color: #fff;
+  cursor: pointer;
+  font: 700 11px/1 Georgia, serif;
+  letter-spacing: .08em;
+  opacity: .85;
+  transition: opacity .2s ease, background .2s ease;
+}
+
+.proto:hover .proto__expand { opacity: 1; background: #171512; }
+
+.proto__expand svg { width: 13px; height: 13px; }
+
+.proto__expand:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb, .lb__figure, .lb-hint { transition: none; }
+}

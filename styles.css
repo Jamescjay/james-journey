@@ -1,0 +1,268 @@
+﻿*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f4efe5;color:#171512;font-family:Segoe UI,Arial,sans-serif}nav{height:68px;padding:0 max(24px,calc((100% - 1160px)/2));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#f4efe5eF;backdrop-filter:blur(12px);z-index:20;border-bottom:1px solid #cfc3b2;font:700 14px Georgia}nav a{color:inherit;text-decoration:none;margin-left:22px}header,main,.thanks,.end,.buddy,.deep{width:min(1160px,calc(100% - 44px));margin:auto}header{min-height:82vh;display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}small,.story>b{font-size:12px;letter-spacing:.17em;color:#73695d}h1,h2,h3{font-family:Georgia,serif}h1{font-size:clamp(68px,9vw,120px);line-height:.82;margin:18px 0 26px}em{color:#ef5b43;font-family:'Comic Sans MS',cursive;font-weight:400}.hero,.scene,.proto{overflow:hidden;border-radius:28px;box-shadow:0 15px 45px #2f26151b;position:relative}.hero img,.scene img,.mem img{width:100%;display:block;filter:grayscale(1);transition:filter .5s,transform .65s}.hero:hover img,.scene:hover img,.mem img:hover{filter:grayscale(0);transform:scale(1.015)}.ticker{text-align:center;border-block:1px solid #cfc3b2;padding:16px;font:700 13px Georgia;letter-spacing:.08em}.chapter,.thanks,.buddy{display:grid;grid-template-columns:1.03fr .97fr;gap:54px;align-items:center;padding:92px 0;border-top:1px solid #cfc3b2}.reverse .scene{order:2}.reverse .story{order:1}.scene span{position:absolute;z-index:2;left:15px;bottom:15px;background:#171512e8;color:white;padding:8px 11px;border-radius:30px;font-size:11px}.story h3{font-size:48px;line-height:1.02;margin:12px 0 18px}.story p,header p,.life p,.end p{font-size:18px;line-height:1.7}.story blockquote{margin:22px 0 0;padding-left:18px;border-left:3px solid #ef5b43;font:italic 20px/1.5 Georgia}.life{background:#1b1917;color:white;padding:100px max(22px,calc((100% - 1160px)/2))}.life>div{max-width:1160px}.life h2,.end h2{font-size:56px;margin:12px 0}.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:35px}.mem img{aspect-ratio:4/3;object-fit:cover;border-radius:18px}.thanks{padding-top:120px}.end{text-align:center;padding:120px 0}.end h2{font-size:clamp(65px,9vw,110px);line-height:.9}.end p{max-width:800px;margin:0 auto 45px}footer{border-top:1px solid #cfc3b2;padding:28px;text-align:center;color:#73695d;font-size:12px}@media(max-width:800px){header,.chapter,.thanks,.buddy{grid-template-columns:1fr}.reverse .scene,.reverse .story{order:initial}.mem{grid-template-columns:1fr}h1{font-size:68px}.story h3{font-size:40px}nav a{display:none}}
+/* ==========================================================================
+   Journey chapters: Scout design story + Copilot prototype.
+   Reuses the existing tokens (Georgia headings, #cfc3b2 rules, #ef5b43
+   accent). Namespaced under .deep so nothing else is affected.
+   ========================================================================== */
+
+.deep { padding: 92px 0; border-top: 1px solid #cfc3b2; }
+
+.deep .story { max-width: 800px; }
+
+/* Hand-off from the illustrated chapters to the real design artifacts. */
+.deep .handoff {
+  margin: 16px 0 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: #73695d;
+  border-left: 3px solid #cfc3b2;
+  padding-left: 18px;
+}
+
+.deep > * + * { margin-top: 34px; }
+
+/* prototype video ------------------------------------------------------ */
+
+.proto {
+  /* Explicit top margin: this rule has the same specificity as
+     `.deep > * + *` and comes later, so it would otherwise zero the gap.
+     `0` on the other sides also clears the UA figure margin of 1em 40px. */
+  margin: 44px 0 0;
+  background: #171512;
+}
+
+.proto video {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 1272 / 636;
+  background: #171512;
+}
+
+.proto figcaption {
+  padding: 14px 18px;
+  background: #fffdf9;
+  border-top: 1px solid #cfc3b2;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #73695d;
+}
+
+/* Figma exports keep their colour; only the illustrations go grayscale. */
+.scene.fig img,
+.scene.fig:hover img { filter: none; }
+
+/* buddy thank-you ------------------------------------------------------ */
+
+/* Cliff's illustration is a transparent PNG, so it sits straight on the page:
+   no frame, no shadow, no crop. Capped by height so it stays in proportion
+   with the chapters around it. */
+.buddy .scene {
+  overflow: visible;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+}
+
+.buddy .scene img {
+  width: auto;
+  max-width: 100%;
+  max-height: 520px;
+  margin-inline: auto;
+}
+
+@media (max-width: 900px) {
+  .deep { padding: 64px 0; }
+  .deep > * + * { margin-top: 26px; }
+  .buddy { gap: 34px; padding: 64px 0; }
+}
+
+/* ==========================================================================
+   "Beyond work" people chapter. Scoped under .life so it inherits the dark
+   treatment; rules mirror .chapter/.story but with dark-surface contrast.
+   ========================================================================== */
+
+.life .lede {
+  max-width: 780px;
+  font-size: 20px;
+  line-height: 1.65;
+  color: #efe8dc;
+  margin: 0 0 18px;
+}
+
+.folk {
+  display: grid;
+  grid-template-columns: 1.03fr .97fr;
+  gap: 54px;
+  align-items: center;
+  padding: 62px 0;
+  margin-top: 34px;
+  border-top: 1px solid #ffffff24;
+}
+
+.folk:first-of-type { margin-top: 52px; }
+
+.folk.reverse .folk-shot { order: 2; }
+.folk.reverse .folk-text { order: 1; }
+
+.folk-shot {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  box-shadow: 0 20px 50px #00000059;
+}
+
+.folk-shot img {
+  width: 100%;
+  display: block;
+  filter: grayscale(1);
+  transition: filter .5s, transform .65s;
+}
+
+.folk-shot:hover img {
+  filter: grayscale(0);
+  transform: scale(1.015);
+}
+
+.folk-text > b {
+  display: block;
+  font-size: 12px;
+  letter-spacing: .17em;
+  color: #a89d8d;
+  margin-bottom: 10px;
+}
+
+.folk-text h3 {
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0 0 16px;
+  color: #fff;
+}
+
+.folk-text p {
+  font-size: 17px;
+  line-height: 1.72;
+  color: #ddd5c8;
+  margin: 0 0 14px;
+}
+
+/* names of the people in the story */
+.life .who {
+  font-style: normal;
+  font-weight: 700;
+  color: #ff8161;
+}
+
+.folk-text blockquote {
+  margin: 20px 0 0;
+  padding-left: 18px;
+  border-left: 3px solid #ef5b43;
+  font: italic 19px/1.5 Georgia, serif;
+  color: #fff;
+}
+
+.folk-end {
+  margin-top: 34px;
+  padding-top: 46px;
+  border-top: 1px solid #ffffff24;
+  max-width: 820px;
+}
+
+.folk-end p {
+  font-size: 18px;
+  line-height: 1.75;
+  color: #ddd5c8;
+  margin: 0 0 16px;
+}
+
+.folk-end strong {
+  display: block;
+  margin-top: 22px;
+  font: italic 22px/1.45 Georgia, serif;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .life .lede { font-size: 18px; }
+  .folk {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 46px 0;
+    margin-top: 20px;
+  }
+  .folk.reverse .folk-shot,
+  .folk.reverse .folk-text { order: initial; }
+  .folk-text h3 { font-size: 27px; }
+  .folk-end { padding-top: 36px; }
+  .folk-end strong { font-size: 19px; }
+}
+
+/* ==========================================================================
+   Editorial pass. Chapter and section titles are h2 so the page has a clean
+   h1 > h2 > h3 outline; the rules below carry that change through, add the
+   small principle labels used in the story, the Chapter 11 lessons list, and
+   baseline focus / reduced-motion support. Existing tokens only.
+   ========================================================================== */
+
+/* Matches the former `.story h3` sizing now that chapter titles are h2. */
+.story h2 { font-size: 48px; line-height: 1.02; margin: 12px 0 18px; }
+
+/* A principle label sitting inside a pull-quote, so the two human-agency
+   moments (OYS and Sentry) share one visual signature. */
+.tenet b {
+  display: block;
+  margin-bottom: 9px;
+  font: 700 12px/1.4 Segoe UI, Arial, sans-serif;
+  letter-spacing: .17em;
+  color: #73695d;
+}
+
+.tenet span { display: block; }
+
+/* chapter 11 - what each project taught me. Run-in list: the project name
+   leads in bold, the lesson follows on the same line. */
+
+.lessons {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lessons li {
+  font-size: 17px;
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+
+.lessons li:last-child { margin-bottom: 0; }
+
+.lessons b { color: #171512; }
+
+/* The closing line of the page, matching the .folk-end treatment. */
+.end strong { display: block; font: italic 24px/1.45 Georgia, serif; }
+
+/* Names of people in the story, matching `.life .who` but darkened for the
+   cream background: #ef5b43 only reaches ~3:1 there, this clears AA at 5.3:1. */
+.story .who {
+  font-style: normal;
+  font-weight: 700;
+  color: #b3351d;
+}
+
+/* accessibility -------------------------------------------------------- */
+
+:focus-visible { outline: 2px solid #ef5b43; outline-offset: 3px; }
+
+@media (max-width: 800px) {
+  .story h2 { font-size: 40px; }
+  .end strong { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero img, .scene img, .mem img, .folk-shot img { transition: none; }
+  .hero:hover img,
+  .scene:hover img,
+  .mem img:hover,
+  .folk-shot:hover img { transform: none; }
+}
